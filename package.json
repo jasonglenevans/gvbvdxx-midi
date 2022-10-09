@@ -1,0 +1,14 @@
+{
+  "name": "gvbvdxx-midi",
+  "version": "1.0.0",
+  "description": "Play Midi Files Using Javascript!",
+  "main": "dev.js",
+  "scripts": {
+    "test": "node dev.js"
+  },
+  "author": "Gvbvdxx/Jasonglenevans",
+  "license": "ISC",
+  "dependencies": {
+    "gvbvdxx-pack": "^2.2.7"
+  }
+}
