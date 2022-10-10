@@ -1,0 +1,29 @@
+{
+  "name": "gvbvdxx-pack",
+  "version": "2.0.0",
+  "description": "Node JS Based API For Making Apps, Simular To Webpack",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "testbuild": "node build.js",
+    "genmain": "node \"packager/genarate main.js\""
+  },
+  "author": "gvbvdxx",
+  "license": "MIT",
+  "dependencies": {
+    "chalk": "^4.0.1",
+    "glob": "^8.0.3",
+    "http": "^0.0.1-security",
+    "node-minify": "^3.6.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/jasonglenevans/gvbvdxx-pack.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/jasonglenevans/gvbvdxx-pack/issues"
+  },
+  "homepage": "https://github.com/jasonglenevans/gvbvdxx-pack#readme"
+}

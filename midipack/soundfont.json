@@ -80,6 +80,10 @@
 			"releaseSpeed":"3.2",
 			"file":"brightness.wav"
 		},
+		"100": {
+			"releaseSpeed":"0.8",
+			"file":"brightness.wav"
+		},
 		"103": {
 			"releaseSpeed":"3.2",
 			"file":"brightness.wav"
@@ -279,6 +283,10 @@
 		"53": {
 			"releaseSpeed":"0.3",
 			"file":"oohs.wav"
+		},
+		"55": {
+			"releaseSpeed":"1",
+			"file":"orchestrahit.wav"
 		}
 	},
 	"drums": {
@@ -404,6 +412,103 @@
 		"63": {
 			"releaseSpeed":"5",
 			"file":"62.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"80": {
+			"releaseSpeed":"5",
+			"file":"80.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"75": {
+			"releaseSpeed":"5",
+			"file":"75.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"76": {
+			"releaseSpeed":"5",
+			"file":"76.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"77": {
+			"releaseSpeed":"5",
+			"file":"77.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"78": {
+			"releaseSpeed":"5",
+			"file":"78.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"79": {
+			"releaseSpeed":"5",
+			"file":"79.wav",
+			"tuning": {
+				"fixedNote":true
+			}
+		},
+		"41": {
+			"releaseSpeed":"5",
+			"file":"bass-drums.wav",
+			"tuning": {
+				"fixedNote":false,
+				"note":41
+			}
+		},
+		"43": {
+			"releaseSpeed":"5",
+			"file":"bass-drums.wav",
+			"tuning": {
+				"fixedNote":false,
+				"note":41
+			}
+		},
+		"45": {
+			"releaseSpeed":"5",
+			"file":"bass-drums.wav",
+			"tuning": {
+				"fixedNote":false,
+				"note":41
+			}
+		},
+		"47": {
+			"releaseSpeed":"5",
+			"file":"bass-drums.wav",
+			"tuning": {
+				"fixedNote":false,
+				"note":41
+			}
+		},
+		"48": {
+			"releaseSpeed":"5",
+			"file":"bass-drums.wav",
+			"tuning": {
+				"fixedNote":false,
+				"note":41
+			}
+		},
+		"50": {
+			"releaseSpeed":"5",
+			"file":"bass-drums.wav",
+			"tuning": {
+				"fixedNote":false,
+				"note":41
+			}
+		},
+		"49": {
+			"releaseSpeed":"5",
+			"file":"cymbal2.wav",
 			"tuning": {
 				"fixedNote":true
 			}

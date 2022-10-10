@@ -22,12 +22,30 @@ function ArrayBufferToString(buffer) {
 }
 class GvbvdxxMidi { 
 	constructor (file,soundfontFile) {
-		if (typeof file == "object") {
+		if (typeof file == "object" || typeof file == "string") {
+			var obj = this;
 			var sfFile = "static/soundfont.gsf";
 			if (soundfontFile) {
 				sfFile = soundfontFile;
 			}
-			this.data = MidiConvert.parse(ArrayBufferToString(file));
+			if (typeof file == "string") {
+				obj.data = "LOADING";
+				fetch(file).then((request) => {
+					var response = request.status;
+					if (response == 200) {
+						request.arrayBuffer().then((arrayBuffer) => {
+							obj.data = MidiConvert.parse(ArrayBufferToString(new Uint8Array(arrayBuffer)));
+						})
+					} else {
+						this.data = null;
+						gconsole.error(`Gvbvdxx Midi Failed To Load Midi File From URL "${file}", Check Your Spelling, And Make Sure The File Exists. Error Code: QUEST RESPONSE ${response}`);
+					}
+				}).catch((e) => {
+					gconsole.error(`Gvbvdxx Midi Failed To Load Midi File From URL "${file}", Check Your Spelling, And Make Sure The File Exists. Error Code: FETCH ERROR ${e}`);
+				});
+			} else {
+				this.data = MidiConvert.parse(ArrayBufferToString(file));
+			}
 			this.listeners = {play:[],stop:[],ended:[],soundfontLoaded:[]};
 			this.fx = {};
 			this.fx.tickAsync = function () {return new Promise((a) => {setTimeout(a,1)})};
@@ -48,7 +66,7 @@ class GvbvdxxMidi {
 				audio = null;
 			};
 			this.sf = null;
-			var obj = this;
+			this.detune = 0;
 			this.loading = true;
 			(async function () {
 				obj.loading = true;
@@ -101,7 +119,7 @@ class GvbvdxxMidi {
 				var fixedNote = false;
 				if (fx.tuning) {
 					if (fx.tuning.note) {
-						tuningNote = 60;
+						tuningNote = fx.tuning.note;
 					}
 					if (fx.tuning.fixedNote) {
 						fixedNote = fx.tuning.fixedNote;
@@ -109,7 +127,7 @@ class GvbvdxxMidi {
 				}
 				if (!(fixedNote)) {
 					audio.preservesPitch = false;
-					audio.playbackRate = 2 ** ((note - tuningNote) / 12);
+					audio.playbackRate = (2 ** ((note - tuningNote) / 12))-obj.detune;
 				}
 				audio.play();
 				await this.waitAsync(length);
@@ -152,7 +170,7 @@ class GvbvdxxMidi {
 				while (notes.length > i && obj.playing) {
 					if (notes[i].time < obj.currentTime/(obj.data.header.bpm/1)) {
 						var vel = notes[i].velocity;
-						this._applyNoteOn(inst,track.channelNumber,notes[i].midi,notes[i].duration,vel*(chInfo.volume/100))
+						this._applyNoteOn(inst,track.channelNumber,notes[i].midi,notes[i].duration,(vel*(chInfo.volume/100))*this.volume)
 						i += 1;
 					} else {
 						await obj.tickAsync();
@@ -171,6 +189,7 @@ class GvbvdxxMidi {
 					return mSecsSinceStart / msPerDay;
 			};
 			this.paused = false;
+			this.volume = 1;
 		} else {
 			throw Error("GvbvdxxMidi Failed To Create Object: Unknown Typeof \""+(typeof file)+"\"");
 		}
@@ -183,51 +202,68 @@ class GvbvdxxMidi {
 		}
 	}
 	play () {
-		this.pausedTime = 0;
-		if (this.paused) {
-			this.paused = false;
-		} else {
-			this.listeners.play.forEach((e) => {e();});
-			this.playing = false;
-			setTimeout(() => {
-				function daysSince2000() {
-					const msPerDay = 24 * 60 * 60 * 1000;
-					const start = new Date(2000, 0, 1); // Months are 0-indexed.
-					const today = new Date();
-					const dstAdjust = today.getTimezoneOffset() - start.getTimezoneOffset();
-					let mSecsSinceStart = today.valueOf() - start.valueOf();
-					mSecsSinceStart += ((today.getTimezoneOffset() - dstAdjust) * 60 * 1000);
-					return mSecsSinceStart / msPerDay;
-				};
-				var obj = this;
-				obj.channelsActive = 0;
-				obj.playing = true;
-				obj.startTime = daysSince2000()*86400;
-				obj.currentTime = (daysSince2000()*86400)-obj.startTime;
-				obj.currentTime = 0;
-				this.channelInfo = {};
-				for (const track of obj.data.tracks) {
-					obj.playTrack(track);
-				}
-				(async function () {
-					obj.channelsDone = 0;
-					while (obj.playing) {
-						await obj.tickAsync();
-						//obj.currentTime += (4*(obj.data.header.bpm/117))/6;
-						if (obj.paused) {
-							obj.startTime = (daysSince2000()*86400)-obj.pauseTime;
-						} else {
-							var time = (daysSince2000()*86400)-obj.startTime;
-							obj.currentTime = (time*120)*(obj.data.header.bpm/117);
-							if (obj.channelsDone+1 > obj.channelsActive) {
-								obj.playing = false;
-								//console.log("done.")
-								obj.listeners.ended.forEach((e) => {e();});
+		if (this.data) {
+			if (this.data == "LOADING") {
+				throw Error("Midi Player In LOADING State.")
+			} else {
+				this.pausedTime = 0;
+				if (this.paused) {
+					this.paused = false;
+				} else {
+					this.listeners.play.forEach((e) => {e();});
+					this.playing = false;
+					setTimeout(() => {
+						function daysSince2000() {
+							const msPerDay = 24 * 60 * 60 * 1000;
+							const start = new Date(2000, 0, 1); // Months are 0-indexed.
+							const today = new Date();
+							const dstAdjust = today.getTimezoneOffset() - start.getTimezoneOffset();
+							let mSecsSinceStart = today.valueOf() - start.valueOf();
+							mSecsSinceStart += ((today.getTimezoneOffset() - dstAdjust) * 60 * 1000);
+							return mSecsSinceStart / msPerDay;
+						};
+						var obj = this;
+						obj.channelsActive = 0;
+						obj.playing = true;
+						obj.startTime = daysSince2000()*86400;
+						obj.currentTime = (daysSince2000()*86400)-obj.startTime;
+						obj.currentTime = 0;
+						this.channelInfo = {};
+						function loadTracks () {
+							for (const track of obj.data.tracks) {
+								obj.playTrack(track);
 							}
 						}
-					}
-				})();
-			},30);
+						loadTracks();
+						(async function () {
+							obj.channelsDone = 0;
+							while (obj.playing) {
+								await obj.tickAsync();
+								//obj.currentTime += (4*(obj.data.header.bpm/117))/6;
+								if (obj.paused) {
+									obj.startTime = (daysSince2000()*86400)-obj.pauseTime;
+								} else {
+									var time = (daysSince2000()*86400)-obj.startTime;
+									obj.currentTime = (time*120)*(obj.data.header.bpm/117);
+									if (obj.channelsDone+1 > obj.channelsActive) {
+										if (obj.looped && obj.playing) {
+											obj.listeners.looped.forEach((e) => {e();});
+											obj.stop();
+											obj.play();
+										} else {
+											obj.playing = false;
+											//console.log("done.")
+											obj.listeners.ended.forEach((e) => {e();});
+										}
+									}
+								}
+							}
+						})();
+					},30);
+				}
+			}
+		} else {
+			gconsole.error("The File Cannot Be Played: The Data Is Null/Undefined, Check Any Console Errors For Reason Of Failure.")
 		}
 	}
 	stop () {
@@ -239,16 +275,41 @@ class GvbvdxxMidi {
 		this.paused = false;
 	}
 	loadMidi (file) {
-		this.data = MidiConvert.parse(ArrayBufferToString(file));
+		if (typeof file == "string") {
+			var obj = this;
+			var prevData = this.data;
+			this.data = "LOADING";
+			fetch(file).then((request) => {
+				var response = request.status;
+				if (response == 200) {
+					request.arrayBuffer().then((arrayBuffer) => {
+						obj.data = MidiConvert.parse(ArrayBufferToString(new Uint8Array(arrayBuffer)));
+					})
+				} else {
+					this.data = prevData;
+					gconsole.error(`Gvbvdxx Midi Failed To Load Midi File From URL "${file}", Check Your Spelling, And Make Sure The File Exists. Error Code: QUEST RESPONSE ${response}`);
+				}
+			}).catch((e) => {
+				gconsole.error(`Gvbvdxx Midi Failed To Load Midi File From URL "${file}", Check Your Spelling, And Make Sure The File Exists. Error Code: FETCH ERROR ${e}`);
+			});
+		} else {
+			this.data = MidiConvert.parse(ArrayBufferToString(file));
+		}
 	}
 }
-console.log(`%c
-======================
-Gvbvdxx Midi
-Ignore The Message "The AudioContext was not allowed to start".
-It is just because the audio has not started, and you 
-must click/interact with the page.
-======================
-`,"color:green;")
+function asyncTick() {
+	return new Promise(() => {
+		
+	})
+}
+GvbvdxxMidi.async = function (file,sf) {
+	return new Promise((resolve) => {
+		var gmid = new GvbvdxxMidi(file,sf);
+		gmid.addEventListener("soundfontLoaded",() => {
+			resolve(gmid);
+		})
+	});
+};
+GvbvdxxMidi.GUI = require("src/gui.js");
 window.GvbvdxxMidi = GvbvdxxMidi;
 module.exports = GvbvdxxMidi;
