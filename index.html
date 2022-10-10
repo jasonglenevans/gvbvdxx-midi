@@ -1,0 +1,39 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+<title>GvbvdxxMidi - Play Midis In Javascript With Ease!</title>
+<link rel="icon" href="static/icon.png">
+</head>
+<body style="background:#e5e9f0;font-family:arial;background-image:url('static/bg.png');">
+<div style="text-align:center;min-height:100vh;height:fit-content;width:1000px;background:#adb5bd;position:absolute;top:0;left:50%;margin-left:-500px;">
+<label style="font-weight:bold;font-size:30px;">Gvbvdxx Midi</label><img src="static/icon.png" width=32 height=32>
+<!--<div id="preview" style="background:#ffffff;width:1000px;height:500px;">-->
+<div>
+<!--<h1>Click To Buttons To Play Midi!</h1><br>-->
+<input type="file" id="selectMidi" accept=".mid,.midi" hidden><button onclick="document.getElementById('selectMidi').click()">Load MIDI</button>
+<select id="midiFile">
+</select>
+<button id="play">Play!</button>
+<button id="stop">Stop!</button>
+<label>Volume</label>
+<input type="range" min="1" max="100" oninput="this.title = this.value+'%';GMidi.volume = document.getElementById('volume').value/100;" title="100%" value="100" id="volume">
+</div>
+<!--</div>-->
+<p>Gvbvdxx Midi Can Be Used To Play Any Midi File! Simple As 123!</p>
+<h1>API</h1>
+<textarea style="width:400px;height:300px;">
+var GMidi = new GvbvdxxMidi(file); //file is Unit8Array
+GMidi.addEventListener("soundfontLoaded",function () {
+	GMidi.play(); //reqiures page interaction to play audio
+});
+</textarea>
+
+<h1>Sources</h1>
+<a href="https://drive.google.com/file/d/1RFyOhvPSLrN5Opp4NmidmNOdQyWktZA5/view">Soundfont: Microsoft GM (WinXP and up)</a>
+<a href="https://www.npmjs.com/package/midiconvert">Converter: Midi Convert</a>
+<a href="https://github.com/jasonglenevans/gvbvdxx-midi/">Github</a>
+</div>
+<script src="main.js?n=1"></script>
+<script src="static/example.js?n=1"></script>
+</body>
+</html>
