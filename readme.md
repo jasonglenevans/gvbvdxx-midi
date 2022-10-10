@@ -27,6 +27,17 @@ put the soundfont.gsf into the static directory (you just created).
 
 load main.js in your root directory
 
+### Modifying And Rebuilding
+
+To Install The Source run ```git clone https://github.com/jasonglenevans/gvbvdxx-midi/``` then ```npm install```
+
+To Test On A Localhost Server:
+
+```node dev.js```
+
+To Build:
+
+```node build.js```
 
 ### API
 
