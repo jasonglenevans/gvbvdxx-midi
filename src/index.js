@@ -46,7 +46,7 @@ class GvbvdxxMidi {
 			} else {
 				this.data = MidiConvert.parse(ArrayBufferToString(file));
 			}
-			this.listeners = {play:[],stop:[],ended:[],soundfontLoaded:[]};
+			this.listeners = {play:[],stop:[],ended:[],soundfontLoaded:[],looped:[]};
 			this.fx = {};
 			this.fx.tickAsync = function () {return new Promise((a) => {setTimeout(a,1)})};
 			this.tickAsync = function () {return new Promise((a) => {setTimeout(a,1)})};
@@ -190,6 +190,7 @@ class GvbvdxxMidi {
 			};
 			this.paused = false;
 			this.volume = 1;
+			this.looped = false;
 		} else {
 			throw Error("GvbvdxxMidi Failed To Create Object: Unknown Typeof \""+(typeof file)+"\"");
 		}
